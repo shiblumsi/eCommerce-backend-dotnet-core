@@ -14,6 +14,11 @@ namespace eCommerce_backend.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
 
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+
 
 
 
@@ -29,6 +34,16 @@ namespace eCommerce_backend.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
+
+            // Configure decimal precision and scale for Product.BasePrice
+            modelBuilder.Entity<Product>()
+                .Property(p => p.BasePrice)
+                .HasColumnType("decimal(8, 2)"); 
+
+            // Configure decimal precision and scale for ProductVariant.Price
+            modelBuilder.Entity<ProductVariant>()
+                .Property(pv => pv.Price)
+                .HasColumnType("decimal(8, 2)");
 
         }
     }

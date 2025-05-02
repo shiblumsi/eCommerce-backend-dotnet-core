@@ -19,5 +19,8 @@
         public string? ShopLogoUrl { get; set; }
 
         public VendorStatus Status { get; set; } = VendorStatus.Pending;
+
+        //Nevigation Property
+        public ICollection<Product> Products { get; set; }
     }
 }
