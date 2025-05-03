@@ -14,5 +14,7 @@
         public int Stock { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public ProductImage ProductImage { get; set; }
     }
 }

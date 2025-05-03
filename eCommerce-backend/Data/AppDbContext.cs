@@ -45,6 +45,12 @@ namespace eCommerce_backend.Data
                 .Property(pv => pv.Price)
                 .HasColumnType("decimal(8, 2)");
 
+            // One-to-one between ProductVariant and ProductImage
+            modelBuilder.Entity<ProductVariant>()
+                .HasOne(pv => pv.ProductImage)
+                .WithOne(pi => pi.ProductVariant)
+                .HasForeignKey<ProductImage>(pi => pi.ProductVarientId);
+
         }
     }
 }

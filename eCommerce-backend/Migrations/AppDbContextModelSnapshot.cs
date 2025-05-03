@@ -136,18 +136,23 @@ namespace eCommerce_backend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsMainImage")
-                        .HasColumnType("bit");
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductVarientId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasFilter("[ProductId] IS NOT NULL");
+
+                    b.HasIndex("ProductVarientId")
+                        .IsUnique()
+                        .HasFilter("[ProductVarientId] IS NOT NULL");
 
                     b.ToTable("ProductImages");
                 });
@@ -301,12 +306,16 @@ namespace eCommerce_backend.Migrations
             modelBuilder.Entity("eCommerce_backend.Data.Entities.ProductImage", b =>
                 {
                     b.HasOne("eCommerce_backend.Data.Entities.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("Images")
+                        .HasForeignKey("eCommerce_backend.Data.Entities.ProductImage", "ProductId");
+
+                    b.HasOne("eCommerce_backend.Data.Entities.ProductVariant", "ProductVariant")
+                        .WithOne("ProductImage")
+                        .HasForeignKey("eCommerce_backend.Data.Entities.ProductImage", "ProductVarientId");
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("eCommerce_backend.Data.Entities.ProductVariant", b =>
@@ -340,9 +349,16 @@ namespace eCommerce_backend.Migrations
 
             modelBuilder.Entity("eCommerce_backend.Data.Entities.Product", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("Images")
+                        .IsRequired();
 
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("eCommerce_backend.Data.Entities.ProductVariant", b =>
+                {
+                    b.Navigation("ProductImage")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("eCommerce_backend.Data.Entities.User", b =>
