@@ -22,6 +22,6 @@
         public Category Category { get; set; }
 
         public ICollection<ProductVariant> Variants { get; set; }
-        public ProductImage Images { get; set; }
+        public ProductImage ProductImage { get; set; }
     }
 }

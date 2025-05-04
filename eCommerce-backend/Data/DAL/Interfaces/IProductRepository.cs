@@ -6,8 +6,8 @@ namespace eCommerce_backend.Data.DAL.Interfaces
     public interface IProductRepository
     {
         // -------------------- Public (Customer-facing) Endpoints --------------------
-        Task<IEnumerable<ProductListItemDto>> GetAllAlProductAsync();
-        Task<ProductDto?> GetProductByIdAsync(int id);
+        Task<List<Product>> GetAllProductAsync();
+        Task<Product?> GetProductByIdAsync(int id);
 
 
         // -------------------- Vendor Endpoints --------------------

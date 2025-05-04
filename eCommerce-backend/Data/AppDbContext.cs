@@ -47,7 +47,7 @@ namespace eCommerce_backend.Data
 
             // One-to-one between ProductVariant and ProductImage
             modelBuilder.Entity<ProductVariant>()
-                .HasOne(pv => pv.ProductImage)
+                .HasOne(pv => pv.VarientImage)
                 .WithOne(pi => pi.ProductVariant)
                 .HasForeignKey<ProductImage>(pi => pi.ProductVarientId);
 

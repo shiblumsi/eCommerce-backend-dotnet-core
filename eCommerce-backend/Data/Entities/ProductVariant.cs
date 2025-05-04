@@ -15,6 +15,6 @@
 
         public bool IsActive { get; set; } = true;
 
-        public ProductImage ProductImage { get; set; }
+        public ProductImage VarientImage { get; set; }
     }
 }

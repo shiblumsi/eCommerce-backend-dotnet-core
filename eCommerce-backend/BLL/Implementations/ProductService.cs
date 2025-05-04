@@ -4,6 +4,8 @@ using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Helper;
 using eCommerce_backend.Models.Request;
 using eCommerce_backend.Models.Response;
+using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eCommerce_backend.BLL.Implementations
 {
@@ -18,6 +20,8 @@ namespace eCommerce_backend.BLL.Implementations
 
         public async Task<ProductDto> AddProductAsync(ProductCreateDto dto)
         {
+
+            Console.WriteLine("DTO JSON: " + JsonSerializer.Serialize(dto));
             var productObj = new Product
             {
                 Name = dto.Name,
@@ -43,16 +47,16 @@ namespace eCommerce_backend.BLL.Implementations
 
             var varientDtoList = new List<ProductVariantDto>();
 
-
+            //debugging
             if (dto.Variants == null)
-                Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Variants is NULL");
+                Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%----> Variants is NULL");
             else
-                Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Received variants: " + dto.Variants.Count);
+                Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Received variants: " + dto.Variants.Count);
 
 
             if (dto.Variants != null && dto.Variants.Any() == true)
             {
-                foreach(var variant in dto.Variants)
+                foreach (var variant in dto.Variants)
                 {
                     var varientObj = new ProductVariant
                     {
@@ -86,11 +90,7 @@ namespace eCommerce_backend.BLL.Implementations
                         Stock = varientObj.Stock,
                         Price = varientObj.Price,
                         IsActive = varientObj.IsActive,
-                        Image = variantImageObj != null ? new ProductImageDto
-                        {
-                            Id = variantImageObj.Id,
-                            ImageUrl = variantImageObj.ImageUrl,
-                        } : null
+                        VarientImage = varientObj.VarientImage.ImageUrl
                     });
                 }
             }
@@ -105,14 +105,56 @@ namespace eCommerce_backend.BLL.Implementations
                 CategoryId = newProduct.CategoryId,
                 VendorId = newProduct.VendorId,
                 Description = newProduct.Description,
-                Images = new ProductImageDto
-                {
-                    Id = newProduct.Id,
-                    ImageUrl = imgUrl
-                },
+                ProductImage = newProduct.ProductImage.ImageUrl,
                 Variants = varientDtoList,
 
             };
+        }
+
+        public async Task<List<ProductListDto>> GetAllProductAsync()
+        {
+            var allProducts = await _productRepository.GetAllProductAsync();
+            var productListDto = allProducts.Select(p => new ProductListDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                BasePrice = p.BasePrice,
+                ProductImage = p.ProductImage.ImageUrl
+
+            }).ToList();
+
+            return productListDto;
+        }
+
+        public async Task<ProductDto?> GetProductByIdAsync(int id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            var dto = new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                BasePrice = product.BasePrice,
+                CategoryId = product.CategoryId,
+                VendorId = product.VendorId,
+                SKU = product.SKU,
+                Slug = product.Slug,
+                ProductImage = product.ProductImage.ImageUrl,
+                Variants = product.Variants?.Select(v => new ProductVariantDto
+                {
+                    Id = v.Id,
+                    Size = v.Size,
+                    Color = v.Color,
+                    Price = v.Price,
+                    Stock = v.Stock,
+                    IsActive = v.IsActive,
+                    VarientImage = v.VarientImage.ImageUrl
+
+                }).ToList() ?? new List<ProductVariantDto>()
+
+            };
+            return dto;
         }
     }
 }

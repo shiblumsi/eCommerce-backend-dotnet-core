@@ -8,6 +8,6 @@
         public decimal? Price { get; set; }
         public int Stock { get; set; }
         public bool IsActive { get; set; }
-        public ProductImageDto? Image { get; set; }
+        public string VarientImage { get; set; }
     }
 }

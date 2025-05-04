@@ -16,7 +16,7 @@ namespace eCommerce_backend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> ProductCreate( ProductCreateDto dto)
+        public async Task<IActionResult> ProductCreate([FromForm] ProductCreateDto dto)
         {
             var newProduct = await _productService.AddProductAsync(dto);
             return Ok(newProduct);

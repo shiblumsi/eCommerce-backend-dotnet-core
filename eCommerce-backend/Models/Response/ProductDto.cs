@@ -11,6 +11,6 @@
         public int CategoryId { get; set; }
         public int VendorId { get; set; }
         public List<ProductVariantDto> Variants { get; set; }
-        public ProductImageDto Images { get; set; }
+        public string ProductImage { get; set; }
     }
 }

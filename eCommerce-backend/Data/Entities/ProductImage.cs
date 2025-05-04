@@ -10,6 +10,6 @@
         public int? ProductVarientId { get; set; }
         public ProductVariant? ProductVariant { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

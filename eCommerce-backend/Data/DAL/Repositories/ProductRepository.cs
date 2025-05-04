@@ -1,6 +1,7 @@
 ﻿using eCommerce_backend.Data.DAL.Interfaces;
 using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Models.Response;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce_backend.Data.DAL.Repositories
 {
@@ -11,6 +12,25 @@ namespace eCommerce_backend.Data.DAL.Repositories
         {
             _context = context;
         }
+
+
+
+        public  async Task<List<Product>> GetAllProductAsync()
+        {
+            return await _context.Products.ToListAsync();
+        }
+
+        public Task<Product?> GetProductByIdAsync(int id)
+        {
+            var product = _context.Products.Include(p => p.Variants).FirstOrDefaultAsync(p => p.Id == id);
+            return product;
+        }
+
+
+
+
+
+
 
         public async Task<Product> AddProductAsync(Product product)
         {
@@ -36,15 +56,9 @@ namespace eCommerce_backend.Data.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ProductListItemDto>> GetAllAlProductAsync()
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public Task<ProductDto?> GetProductByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public Task<ProductVariant?> GetProductVariantByIdAsync(int variantId)
         {
