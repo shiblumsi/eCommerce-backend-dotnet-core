@@ -120,7 +120,7 @@ namespace eCommerce_backend.BLL.Implementations
                 Name = p.Name,
                 Description = p.Description,
                 BasePrice = p.BasePrice,
-                ProductImage = p.ProductImage.ImageUrl
+                ProductImage = p.ProductImage?.ImageUrl ?? string.Empty
 
             }).ToList();
 
@@ -140,7 +140,7 @@ namespace eCommerce_backend.BLL.Implementations
                 VendorId = product.VendorId,
                 SKU = product.SKU,
                 Slug = product.Slug,
-                ProductImage = product.ProductImage.ImageUrl,
+                ProductImage = product.ProductImage?.ImageUrl ?? string.Empty,
                 Variants = product.Variants?.Select(v => new ProductVariantDto
                 {
                     Id = v.Id,
@@ -149,7 +149,7 @@ namespace eCommerce_backend.BLL.Implementations
                     Price = v.Price,
                     Stock = v.Stock,
                     IsActive = v.IsActive,
-                    VarientImage = v.VarientImage.ImageUrl
+                    VarientImage = v.VarientImage?.ImageUrl ?? string.Empty
 
                 }).ToList() ?? new List<ProductVariantDto>()
 

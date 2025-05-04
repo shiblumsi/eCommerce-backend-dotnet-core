@@ -17,12 +17,18 @@ namespace eCommerce_backend.Data.DAL.Repositories
 
         public  async Task<List<Product>> GetAllProductAsync()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products
+                .Include(p => p.ProductImage)
+                .ToListAsync();
         }
 
         public Task<Product?> GetProductByIdAsync(int id)
         {
-            var product = _context.Products.Include(p => p.Variants).FirstOrDefaultAsync(p => p.Id == id);
+            var product = _context.Products
+                .Include(p => p.ProductImage)
+                .Include(p => p.Variants)
+                .ThenInclude(v => v.VarientImage)
+                .FirstOrDefaultAsync(p => p.Id == id);
             return product;
         }
 
