@@ -8,11 +8,14 @@ namespace eCommerce_backend.BLL.Interfaces
         //---------------------Customer/Public ------------------------
 
         public Task<List<ProductListDto>> GetAllProductAsync();
-        Task<ProductDto?> GetProductByIdAsync(int id);
+        Task<ProductWithVarientsDto?> GetProductByIdAsync(int id);
 
 
         // -------------------- Vendor Endpoints --------------------
 
-        Task<ProductDto> AddProductAsync(ProductCreateDto dto);
+        Task<ProductWithVarientsDto> AddProductAsync(int vendorId, ProductWithVarientCreateDto dto);
+        Task<List<ProductWithVarientsDto>> GetAllProductsForVendorWithVarients(int vendorId);
+        Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int productId, int vendorId);
+        Task<ProductUpdateDto?> UpdateProductAsync(int productId, ProductUpdateDto updateDto);
     }
 }

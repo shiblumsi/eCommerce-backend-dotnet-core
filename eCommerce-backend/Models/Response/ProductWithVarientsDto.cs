@@ -1,6 +1,6 @@
 ﻿namespace eCommerce_backend.Models.Response
 {
-    public class ProductDto
+    public class ProductWithVarientsDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

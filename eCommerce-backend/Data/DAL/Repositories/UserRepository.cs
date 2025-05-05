@@ -27,5 +27,15 @@ namespace eCommerce_backend.Data.DAL.Repositories
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Vendor?> GetVendorByUserIdAsync(int userId)
+        {
+            return await _context.Vendors.FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        public async Task<Customer?> GetCustomerByUserIdAsync(int userId)
+        {
+            return await _context.Customers.FirstOrDefaultAsync(u => u.UserId == userId);
+        }
     }
 }

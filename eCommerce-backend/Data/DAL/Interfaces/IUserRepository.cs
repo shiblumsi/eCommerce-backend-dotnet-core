@@ -6,5 +6,10 @@ namespace eCommerce_backend.Data.DAL.Interfaces
     {
         public Task<User?> GetUserByEmailOrPhoneAsync(string emailOrPhone);
         public Task AddUserAsync(User user);
+
+
+        //common
+        Task<Vendor?> GetVendorByUserIdAsync(int userId);
+        Task<Customer?> GetCustomerByUserIdAsync(int userId);
     }
 }

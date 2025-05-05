@@ -2,6 +2,7 @@
 using eCommerce_backend.Data.DAL.Interfaces;
 using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Helper;
+using eCommerce_backend.Migrations;
 using eCommerce_backend.Models.Request;
 using eCommerce_backend.Models.Response;
 using System.Text.Json;
@@ -18,7 +19,59 @@ namespace eCommerce_backend.BLL.Implementations
         }
 
 
-        public async Task<ProductDto> AddProductAsync(ProductCreateDto dto)
+        //---------------------Customer/Public -----------------------------------------------
+        public async Task<List<ProductListDto>> GetAllProductAsync()
+        {
+            var allProducts = await _productRepository.GetAllProductAsync();
+            var productListDto = allProducts.Select(p => new ProductListDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                BasePrice = p.BasePrice,
+                ProductImage = p.ProductImage?.ImageUrl ?? string.Empty
+
+            }).ToList();
+
+            return productListDto;
+        }
+
+        public async Task<ProductWithVarientsDto?> GetProductByIdAsync(int id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            var dto = new ProductWithVarientsDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                BasePrice = product.BasePrice,
+                CategoryId = product.CategoryId,
+                VendorId = product.VendorId,
+                SKU = product.SKU,
+                Slug = product.Slug,
+                ProductImage = product.ProductImage?.ImageUrl ?? string.Empty,
+                Variants = product.Variants?.Select(v => new ProductVariantDto
+                {
+                    Id = v.Id,
+                    Size = v.Size,
+                    Color = v.Color,
+                    Price = v.Price,
+                    Stock = v.Stock,
+                    IsActive = v.IsActive,
+                    VarientImage = v.VarientImage?.ImageUrl ?? string.Empty
+
+                }).ToList() ?? new List<ProductVariantDto>()
+
+            };
+            return dto;
+        }
+
+
+        
+
+
+        // -------------------- Vendor Endpoints --------------------------------------------------------------------
+        public async Task<ProductWithVarientsDto> AddProductAsync(int vendorId, ProductWithVarientCreateDto dto)
         {
 
             Console.WriteLine("DTO JSON: " + JsonSerializer.Serialize(dto));
@@ -30,7 +83,7 @@ namespace eCommerce_backend.BLL.Implementations
                 Description = dto.Description,
                 BasePrice = dto.BasePrice,
                 CategoryId = dto.CategoryId,
-                VendorId = dto.VendorId,
+                VendorId = vendorId,
             };
             var newProduct = await _productRepository.AddProductAsync(productObj);
 
@@ -95,7 +148,7 @@ namespace eCommerce_backend.BLL.Implementations
                 }
             }
 
-            return new ProductDto
+            return new ProductWithVarientsDto
             {
                 Id = newProduct.Id,
                 Name = newProduct.Name,
@@ -111,50 +164,103 @@ namespace eCommerce_backend.BLL.Implementations
             };
         }
 
-        public async Task<List<ProductListDto>> GetAllProductAsync()
+
+        public async Task<List<ProductWithVarientsDto>> GetAllProductsForVendorWithVarients(int vendorId)
         {
-            var allProducts = await _productRepository.GetAllProductAsync();
-            var productListDto = allProducts.Select(p => new ProductListDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                BasePrice = p.BasePrice,
-                ProductImage = p.ProductImage?.ImageUrl ?? string.Empty
-
-            }).ToList();
-
-            return productListDto;
-        }
-
-        public async Task<ProductDto?> GetProductByIdAsync(int id)
-        {
-            var product = await _productRepository.GetProductByIdAsync(id);
-            var dto = new ProductDto
+            var products = await _productRepository.GetAllProductsForVendorWithVarients(vendorId);
+            var dto = products.Select(product => new ProductWithVarientsDto
             {
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
                 BasePrice = product.BasePrice,
-                CategoryId = product.CategoryId,
-                VendorId = product.VendorId,
-                SKU = product.SKU,
-                Slug = product.Slug,
-                ProductImage = product.ProductImage?.ImageUrl ?? string.Empty,
-                Variants = product.Variants?.Select(v => new ProductVariantDto
+                ProductImage = product.ProductImage?.ImageUrl, // Optional chaining
+
+                Variants = product.Variants?.Select(varient => new ProductVariantDto
                 {
-                    Id = v.Id,
-                    Size = v.Size,
-                    Color = v.Color,
-                    Price = v.Price,
-                    Stock = v.Stock,
-                    IsActive = v.IsActive,
-                    VarientImage = v.VarientImage?.ImageUrl ?? string.Empty
+                    Id = varient.Id,
+                    Size = varient.Size,
+                    Color = varient.Color,
+                    Stock = varient.Stock,
+                    Price = varient.Price,
+                    VarientImage = varient.VarientImage?.ImageUrl // Safe null access
+                }).ToList() ?? new List<ProductVariantDto>() // If null, return empty list
+            }).ToList();
 
+            return dto;
+        }
+
+        public async Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int productId, int vendorId)
+        {
+            var product = await _productRepository.GetVendorProductByIdAsync(productId, vendorId);
+            var dto = new ProductWithVarientsDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                BasePrice = product.BasePrice,
+                ProductImage = product.ProductImage.ImageUrl,
+                Variants = product.Variants?.Select(varient => new ProductVariantDto
+                {
+                    Id = varient.Id,
+                    Size = varient.Size,
+                    Color = varient.Color,
+                    Stock = varient.Stock,
+                    Price = varient.Price,
+                    VarientImage = varient.VarientImage.ImageUrl
                 }).ToList() ?? new List<ProductVariantDto>()
-
             };
             return dto;
+        }
+
+        public async Task<ProductUpdateDto> UpdateProductAsync(int id, ProductUpdateDto updateDto)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            if (product == null)
+                throw new Exception("Product not found.");
+
+
+            // Update only if values are provided
+            if (!string.IsNullOrEmpty(updateDto.Name))
+                product.Name = updateDto.Name;
+
+            if (!string.IsNullOrEmpty(updateDto.Description))
+                product.Description = updateDto.Description;
+
+            if (updateDto.BasePrice.HasValue)
+                product.BasePrice = updateDto.BasePrice.Value;
+
+            if (updateDto.CategoryId.HasValue)
+                product.CategoryId = updateDto.CategoryId.Value;
+
+            // Handle Image upload if provided
+            if (updateDto.ProductImage != null)
+            {
+                var imgUrl = await FileHelper.SaveImageAsync(updateDto.ProductImage, "uploads/image/Product");
+
+                if (product.ProductImage == null)
+                {
+                    product.ProductImage = new ProductImage
+                    {
+                        ImageUrl = imgUrl,
+                        ProductId = id
+                    };
+                }
+                else
+                {
+                    product.ProductImage.ImageUrl = imgUrl;
+                }
+
+            }
+            var updatedProduct = await _productRepository.UpdateProductAsync(product);
+
+            return new ProductUpdateDto
+            {
+                Name = updatedProduct.Name,
+                Description = updatedProduct.Description,
+                BasePrice = updatedProduct.BasePrice,
+                CategoryId = updatedProduct.CategoryId,
+            };
         }
     }
 }
