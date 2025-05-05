@@ -15,7 +15,7 @@ namespace eCommerce_backend.Data.DAL.Interfaces
 
         Task<Product> AddProductAsync(Product product);  //
         Task<List<Product>> GetAllProductsForVendorWithVarients(int vendorId); //
-        Task<Product?> GetVendorProductByIdAsync(int productId, int vendorId);//
+        Task<Product?> GetVendorProductByIdAsync(int id);//
         Task<Product> UpdateProductAsync(Product product);
         Task DeleteProductAsync(int id);
 

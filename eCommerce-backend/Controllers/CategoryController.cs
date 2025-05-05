@@ -1,6 +1,7 @@
 ﻿using eCommerce_backend.BLL.Interfaces;
 using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Models.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace eCommerce_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "AdminOnly")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;

@@ -2,6 +2,7 @@
 using eCommerce_backend.Data.DAL.Interfaces;
 using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Models.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace eCommerce_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(Policy = "VendorOnly")]
     public class VendorProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -36,6 +38,8 @@ namespace eCommerce_backend.Controllers
             return Ok(newProduct);
         }
 
+
+
         [HttpGet("all-products")]
         public async Task<IActionResult> GetVendorsAllProduct()
         {
@@ -52,26 +56,34 @@ namespace eCommerce_backend.Controllers
             return Ok(products);
         }
 
+
+
+
         [HttpGet("product/{id}")]
-        public async Task<IActionResult> GetVendorProduct(int productId)
+        public async Task<IActionResult> GetVendorProduct(int id)
         {
-            var userIdFromToken = User.FindFirst("UserId");
-            if (userIdFromToken == null) return Unauthorized("User ID not found in token.");
-
-            int userId = int.Parse(userIdFromToken.Value);
-            var vendor = await _userRepository.GetVendorByUserIdAsync(userId);
-            if (vendor == null) return NotFound("Vendor Not Found");
-
-            var product = await _productService.GetProductByIdAsync(productId);
+           
+            var product = await _productService.GetVendorProductByIdAsync(id);
+            if (product == null)
+            {
+                return Unauthorized("You are not authorized to View another vendor's product. You can only view your own products.");
+            }
 
             return Ok(product);
 
         }
 
+
+        
         [HttpPatch("update-product/{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductUpdateDto update)
         {
             var updatedProduct = await _productService.UpdateProductAsync(id, update);
+
+            if (updatedProduct == null)
+            {
+                return Unauthorized("You are not authorized to update this product. You can only update your own products.");
+            }
             return Ok(updatedProduct);
         }
     }

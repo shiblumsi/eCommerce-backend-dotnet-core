@@ -25,9 +25,9 @@ namespace eCommerce_backend.BLL.Implementations
             var claims = new[]
             {
                 new Claim("UserId", user.Id.ToString()),
-                new Claim("Email", user.Email ?? ""),
+                new Claim(ClaimTypes.Email, user.Email?.ToString() ?? ""),
                 new Claim("PhoneNumber", user.PhoneNumber ?? ""),
-                new Claim("Role", user.Role.ToString()),
+                new Claim("role", user.Role.ToString()),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

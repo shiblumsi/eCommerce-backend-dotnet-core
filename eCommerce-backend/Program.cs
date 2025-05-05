@@ -42,6 +42,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+//Add Authorization policy
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("VendorOnly", policy =>
+        policy.RequireRole("Vendor"));
+
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+
+    options.AddPolicy("Customer", policy =>
+        policy.RequireRole("Customer"));
+});
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -51,6 +63,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
+
+
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

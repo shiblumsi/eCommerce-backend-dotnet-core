@@ -13,9 +13,11 @@ namespace eCommerce_backend.BLL.Implementations
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
-        public ProductService(IProductRepository productRepository)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ProductService(IProductRepository productRepository, IHttpContextAccessor httpContextAccessor)
         {
             _productRepository = productRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -190,9 +192,14 @@ namespace eCommerce_backend.BLL.Implementations
             return dto;
         }
 
-        public async Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int productId, int vendorId)
+        public async Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int id)
         {
-            var product = await _productRepository.GetVendorProductByIdAsync(productId, vendorId);
+            var product = await _productRepository.GetVendorProductByIdAsync(id);
+            if (product == null) throw new Exception("Product Not Found!");
+
+            var currentUser = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("UserId")?.Value);
+            if (product.VendorId != currentUser) return null;
+
             var dto = new ProductWithVarientsDto
             {
                 Id = product.Id,
@@ -216,11 +223,18 @@ namespace eCommerce_backend.BLL.Implementations
         public async Task<ProductUpdateDto> UpdateProductAsync(int id, ProductUpdateDto updateDto)
         {
             var product = await _productRepository.GetProductByIdAsync(id);
+            
             if (product == null)
                 throw new Exception("Product not found.");
 
+            var currentUserId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("UserId")?.Value);
 
-            // Update only if values are provided
+            if (product.VendorId != currentUserId)
+            {
+                return null;
+            }
+
+
             if (!string.IsNullOrEmpty(updateDto.Name))
                 product.Name = updateDto.Name;
 

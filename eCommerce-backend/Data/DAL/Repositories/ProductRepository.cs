@@ -58,14 +58,13 @@ namespace eCommerce_backend.Data.DAL.Repositories
         }
 
 
-        public Task<Product?> GetVendorProductByIdAsync(int productId,int vendorId)
+        public Task<Product?> GetVendorProductByIdAsync(int id)
         {
             return _context.Products
-                .Where(p => p.VendorId == vendorId)
                 .Include(p => p.ProductImage)
                 .Include(p => p.Variants)
                 .ThenInclude(v => v.VarientImage)
-                .FirstOrDefaultAsync(p => p.Id == productId);
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Product> UpdateProductAsync(Product product)
