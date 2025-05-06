@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eCommerce_backend.Data;
 
@@ -11,9 +12,11 @@ using eCommerce_backend.Data;
 namespace eCommerce_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506153310_cart")]
+    partial class cart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,38 +47,6 @@ namespace eCommerce_backend.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("eCommerce_backend.Data.Entities.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductVariantId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("ProductVariantId");
-
-                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("eCommerce_backend.Data.Entities.Category", b =>
@@ -332,25 +303,6 @@ namespace eCommerce_backend.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("eCommerce_backend.Data.Entities.CartItem", b =>
-                {
-                    b.HasOne("eCommerce_backend.Data.Entities.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("eCommerce_backend.Data.Entities.ProductVariant", "ProductVariant")
-                        .WithMany()
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("ProductVariant");
-                });
-
             modelBuilder.Entity("eCommerce_backend.Data.Entities.Category", b =>
                 {
                     b.HasOne("eCommerce_backend.Data.Entities.Category", "ParentCategory")
@@ -425,11 +377,6 @@ namespace eCommerce_backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("eCommerce_backend.Data.Entities.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("eCommerce_backend.Data.Entities.Category", b =>

@@ -18,7 +18,8 @@ namespace eCommerce_backend.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
 
 
@@ -50,6 +51,18 @@ namespace eCommerce_backend.Data
                 .HasOne(pv => pv.VarientImage)
                 .WithOne(pi => pi.ProductVariant)
                 .HasForeignKey<ProductImage>(pi => pi.ProductVarientId);
+
+            modelBuilder.Entity<CartItem>()
+                 .HasOne(ci => ci.Cart)
+                 .WithMany(c => c.CartItems)
+                 .HasForeignKey(ci => ci.CartId)
+                 .OnDelete(DeleteBehavior.Cascade); // Keep cascade for Cart
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.ProductVariant)
+                .WithMany()  // Assuming ProductVariant does not need navigation property for CartItems
+                .HasForeignKey(ci => ci.ProductVariantId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }
