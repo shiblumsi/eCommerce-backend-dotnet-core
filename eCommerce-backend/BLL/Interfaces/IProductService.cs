@@ -15,7 +15,7 @@ namespace eCommerce_backend.BLL.Interfaces
 
         Task<ProductWithVarientsDto> AddProductAsync(int vendorId, ProductWithVarientCreateDto dto);
         Task<List<ProductWithVarientsDto>> GetAllProductsForVendorWithVarients(int vendorId);
-        Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int id);
-        Task<ProductUpdateDto?> UpdateProductAsync(int productId, ProductUpdateDto updateDto);
+        Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int id, int vendorId);
+        Task<ProductUpdateDto?> UpdateProductAsync(int productId,int vendorId, ProductUpdateDto updateDto);
     }
 }

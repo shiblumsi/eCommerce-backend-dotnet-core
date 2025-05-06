@@ -10,7 +10,7 @@ namespace eCommerce_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Policy = "VendorOnly")]
+    [Authorize(Policy = "VendorOnly")]
     public class VendorProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -62,8 +62,15 @@ namespace eCommerce_backend.Controllers
         [HttpGet("product/{id}")]
         public async Task<IActionResult> GetVendorProduct(int id)
         {
-           
-            var product = await _productService.GetVendorProductByIdAsync(id);
+            var userIdFromToken = User.FindFirst("UserId");
+            if (userIdFromToken == null) return Unauthorized("User ID not found in token.");
+
+            int userId = int.Parse(userIdFromToken.Value);
+
+            var vendor = await _userRepository.GetVendorByUserIdAsync(userId);
+            if (vendor == null) return NotFound("Vendor Not Found");
+
+            var product = await _productService.GetVendorProductByIdAsync(id, vendor.Id);
             if (product == null)
             {
                 return Unauthorized("You are not authorized to View another vendor's product. You can only view your own products.");
@@ -76,9 +83,17 @@ namespace eCommerce_backend.Controllers
 
         
         [HttpPatch("update-product/{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductUpdateDto update)
+        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductUpdateDto updateDto)
         {
-            var updatedProduct = await _productService.UpdateProductAsync(id, update);
+            var userIdFromToken = User.FindFirst("UserId");
+            if (userIdFromToken == null) return Unauthorized("User ID not found in token.");
+
+            int userId = int.Parse(userIdFromToken.Value);
+
+            var vendor = await _userRepository.GetVendorByUserIdAsync(userId);
+            if (vendor == null) return NotFound("Vendor Not Found");
+
+            var updatedProduct = await _productService.UpdateProductAsync(id,vendor.Id, updateDto);
 
             if (updatedProduct == null)
             {
