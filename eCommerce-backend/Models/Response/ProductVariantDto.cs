@@ -9,5 +9,6 @@
         public int Stock { get; set; }
         public bool IsActive { get; set; }
         public string VarientImage { get; set; }
+        public int VendorId { get; set; }
     }
 }

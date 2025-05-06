@@ -1,4 +1,5 @@
-﻿using eCommerce_backend.Models.Request;
+﻿using eCommerce_backend.Data.Entities;
+using eCommerce_backend.Models.Request;
 using eCommerce_backend.Models.Response;
 
 namespace eCommerce_backend.BLL.Interfaces
@@ -17,5 +18,10 @@ namespace eCommerce_backend.BLL.Interfaces
         Task<List<ProductWithVarientsDto>> GetAllProductsForVendorWithVarients(int vendorId);
         Task<ProductWithVarientsDto?> GetVendorProductByIdAsync(int id, int vendorId);
         Task<ProductUpdateDto?> UpdateProductAsync(int productId,int vendorId, ProductUpdateDto updateDto);
+
+
+        // varient 
+        Task<ProductVariantDto?> GetProductVariantByIdAsync(int variantId);
+        Task UpdateProductVariantAsync(ProductVariant variant);
     }
 }

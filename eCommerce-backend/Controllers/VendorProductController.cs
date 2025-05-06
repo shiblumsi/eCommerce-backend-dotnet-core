@@ -1,4 +1,5 @@
-﻿using eCommerce_backend.BLL.Interfaces;
+﻿using eCommerce_backend.BLL.Implementations;
+using eCommerce_backend.BLL.Interfaces;
 using eCommerce_backend.Data.DAL.Interfaces;
 using eCommerce_backend.Data.Entities;
 using eCommerce_backend.Models.Request;
@@ -100,6 +101,29 @@ namespace eCommerce_backend.Controllers
                 return Unauthorized("You are not authorized to update this product. You can only update your own products.");
             }
             return Ok(updatedProduct);
+        }
+
+
+        //varients
+        [HttpGet("product-varient/{id}")]
+        public async Task<IActionResult> GetProductVarient(int id)
+        {
+            var userIdFromToken = User.FindFirst("UserId");
+            if (userIdFromToken == null) return Unauthorized("User ID not found in token.");
+
+            int userId = int.Parse(userIdFromToken.Value);
+
+            var vendor = await _userRepository.GetVendorByUserIdAsync(userId);
+            if (vendor == null) return NotFound("Vendor Not Found");
+
+            var pVarient = await _productService.GetProductVariantByIdAsync(id);
+            if (pVarient == null) return NotFound("not Found");
+
+            if(pVarient.VendorId != vendor.Id)
+            {
+                return Unauthorized("You are not authorized to access this variant.");
+            }
+            return Ok(pVarient);
         }
     }
 }

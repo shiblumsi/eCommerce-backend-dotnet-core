@@ -278,5 +278,28 @@ namespace eCommerce_backend.BLL.Implementations
                 CategoryId = updatedProduct.CategoryId,
             };
         }
+
+        public async Task<ProductVariantDto?> GetProductVariantByIdAsync(int variantId)
+        {
+            var pVarient = await _productRepository.GetProductVariantByIdAsync(variantId);
+            if (pVarient == null) throw new Exception("not found");
+
+            return new ProductVariantDto
+            {
+                Id = pVarient.Id,
+                Size = pVarient.Size,
+                Color = pVarient.Color,
+                Price = pVarient.Price,
+                Stock = pVarient.Stock,
+                IsActive = pVarient.IsActive,
+                VendorId = pVarient.Product.VendorId,
+                VarientImage = pVarient.VarientImage.ImageUrl
+            };
+        }
+
+        public Task UpdateProductVariantAsync(ProductVariant variant)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

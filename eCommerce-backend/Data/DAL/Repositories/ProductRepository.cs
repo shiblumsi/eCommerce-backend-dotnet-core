@@ -74,6 +74,11 @@ namespace eCommerce_backend.Data.DAL.Repositories
             return product;
         }
 
+        public Task DeleteProductAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         // ----------- Variants (Vendor) -----------
         public async Task<ProductVariant> AddProductVariantAsync(ProductVariant variant)
         {
@@ -82,30 +87,22 @@ namespace eCommerce_backend.Data.DAL.Repositories
             return variant;
         }
 
-        public Task DeleteProductAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteProductVariantAsync(int variantId)
-        {
-            throw new NotImplementedException();
-        }
-
-        
-
-        
-
         public Task<ProductVariant?> GetProductVariantByIdAsync(int variantId)
         {
-            throw new NotImplementedException();
+            return _context.ProductVariants
+                .Include(v => v.VarientImage)
+                .Include(v => v.Product)
+                .FirstOrDefaultAsync(v => v.Id == variantId);
         }
 
-
+        public async Task UpdateProductVariantAsync(ProductVariant variant)
+        {
+            _context.ProductVariants.Update(variant);
+            await _context.SaveChangesAsync();
+        }
 
         
-
-        public Task UpdateProductVariantAsync(ProductVariant variant)
+        public Task DeleteProductVariantAsync(int variantId)
         {
             throw new NotImplementedException();
         }
