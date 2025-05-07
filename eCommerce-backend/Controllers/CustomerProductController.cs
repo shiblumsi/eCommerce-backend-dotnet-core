@@ -56,5 +56,25 @@ namespace eCommerce_backend.Controllers
             return Ok(cart);
         }
 
+        [Authorize(Policy = "CustomerOnly")]
+        [HttpPut("cart-item/{id}/increase")]
+        public async Task<IActionResult> IncreaseCartItem(int id)
+        {
+            var userId = int.Parse(User.FindFirst("UserId")?.Value);
+            var customer = await _userRepository.GetCustomerByUserIdAsync(userId);
+            var result = await _cartService.ChangeCartItemQuantityAsync(id, +1, customer.Id);
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "CustomerOnly")]
+        [HttpPut("cart-item/{id}/decrease")]
+        public async Task<IActionResult> DecreaseCartItem(int id)
+        {
+            var userId = int.Parse(User.FindFirst("UserId")?.Value);
+            var customer = await _userRepository.GetCustomerByUserIdAsync(userId);
+            var result = await _cartService.ChangeCartItemQuantityAsync(id, -1, customer.Id);
+            return Ok(result);
+        }
+
     }
 }

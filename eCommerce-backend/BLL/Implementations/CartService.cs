@@ -55,6 +55,8 @@ namespace eCommerce_backend.BLL.Implementations
             };
         }
 
+        
+
         public async Task<CartWithItemsDto> GetCustomerCart(int customerId)
         {
             var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
@@ -72,5 +74,38 @@ namespace eCommerce_backend.BLL.Implementations
                 }).ToList() ?? new List<CartItemDto>()
             };
         }
+
+
+        public async Task<CartWithItemsDto> ChangeCartItemQuantityAsync(int cartItemId, int change, int customerId)
+        {
+            var cartItem = await _cartRepository.GetCartItemByIdAsync(cartItemId);
+            if (cartItem == null) throw new Exception("not found cartItem");
+
+            cartItem.Quantity += change;
+
+            if(cartItem.Quantity <= 0)
+            {
+                await _cartRepository.RemoveCartItemAsync(cartItemId);
+            }
+            else
+            {
+                await _cartRepository.UpdateCartItemAsync(cartItem);
+            }
+
+            var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
+
+            return new CartWithItemsDto
+            {
+                Id = cart.Id,
+                Items = cart.CartItems?.Select(i => new CartItemDto
+                {
+                    Id = i.Id,
+                    ProductVarientId = i.ProductVariantId,
+                    Quantity = i.Quantity,
+                    Price = i.ProductVariant?.Price ?? 0m
+                }).ToList()
+            };
+        }
+
     }
 }

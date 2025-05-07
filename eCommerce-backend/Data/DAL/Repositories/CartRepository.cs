@@ -53,6 +53,7 @@ namespace eCommerce_backend.Data.DAL.Repositories
         public async Task<CartItem> GetCartItemByIdAsync(int cartItemId)
         {
             return await _context.CartItems
+                .Include(c=> c.Cart)
                 .Include(ci => ci.ProductVariant)
                 .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
         }
